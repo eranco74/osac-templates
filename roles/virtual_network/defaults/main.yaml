@@ -1,0 +1,10 @@
+---
+# Default labels for VirtualNetwork resources
+default_vn_labels: "{{ {virtual_network_label: virtual_network_name} | default({}) }}"
+
+# Setup the defaults described in the arg_specs
+default_arg_specs: {}
+
+# Future: MTU, topology overrides could be added here
+# mtu: 1400
+# topology: Layer2
