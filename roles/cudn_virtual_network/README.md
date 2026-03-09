@@ -1,17 +1,30 @@
-# VirtualNetwork Ansible Role
+# CUDN VirtualNetwork Ansible Role (`cudn_virtual_network`)
 
 ## Overview
 
 This role provisions VirtualNetwork resources as part of the OSAC (OpenShift-as-a-Service-in-a-Container) networking stack.
 
-**IMPORTANT ARCHITECTURAL NOTE:** VirtualNetwork is a **logical grouping** for network configuration. This role is a **stub implementation** that does NOT create any OpenShift resources (no ClusterUserDefinedNetwork/CUDN). The actual network provisioning happens when Subnet resources are created (see `subnet` role).
+This role implements the `cudn` (ClusterUserDefinedNetwork) strategy for the VirtualNetwork resource. It is selected when `NetworkClass.implementation_strategy = "cudn"`.
+
+**IMPORTANT ARCHITECTURAL NOTE:** VirtualNetwork is a **logical grouping** for network configuration. This role is a **stub implementation** that does NOT create any OpenShift resources (no ClusterUserDefinedNetwork/CUDN). The actual network provisioning happens when Subnet resources are created (see `cudn_subnet` role).
+
+## Role Selection
+
+The playbook dynamically selects this role based on the NetworkClass implementation strategy:
+
+```yaml
+- name: Call the selected virtual network template
+  ansible.builtin.include_role:
+    name: "{{ network_class_implementation_strategy }}_virtual_network"
+    tasks_from: "create"
+```
 
 ## Architecture Decision
 
-Based on v3.0 architecture research, VirtualNetwork serves as a parent resource for organizing Subnets and SecurityGroups. The actual User Defined Network (UDN) resources are created by the Subnet role, not the VirtualNetwork role.
+Based on v3.0 architecture research, VirtualNetwork serves as a parent resource for organizing Subnets and SecurityGroups. The actual User Defined Network (UDN) resources are created by the `cudn_subnet` role, not this role.
 
 This design choice aligns with the OVN-Kubernetes networking model where:
-- **Subnet** → UserDefinedNetwork (UDN) - namespace-scoped, creates the actual network
+- **Subnet** → ClusterUserDefinedNetwork (CUDN) - cluster-scoped, creates the actual network
 - **VirtualNetwork** → Logical grouping - provides configuration context for child Subnets
 
 ## Usage
@@ -40,9 +53,11 @@ This role is called by AAP Direct via Event-Driven Ansible (EDA) when a VirtualN
   tasks:
     - name: Call VirtualNetwork template
       ansible.builtin.include_role:
-        name: virtual_network
+        name: "{{ network_class_implementation_strategy }}_virtual_network"
         tasks_from: create
 ```
+
+Where `network_class_implementation_strategy` is determined from the NetworkClass lookup (e.g., `"cudn"`).
 
 ### VirtualNetwork CR Structure
 
@@ -88,8 +103,8 @@ Logs VirtualNetwork deletion completion and returns success. No resources to cle
 
 ## Related Roles
 
-- **subnet**: Creates UserDefinedNetwork (UDN) resources - the actual network provisioning
-- **security_group**: Creates NetworkPolicy resources for security rules (future)
+- **cudn_subnet**: Creates Namespace and ClusterUserDefinedNetwork (CUDN) resources - the actual network provisioning
+- **cudn_security_group**: Creates NetworkPolicy resources for security rules (future)
 
 ## Integration with AAP
 

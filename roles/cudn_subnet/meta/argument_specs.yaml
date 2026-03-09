@@ -1,0 +1,19 @@
+---
+argument_specs:
+  main:
+    options:
+      subnet:
+        type: dict
+        required: true
+        description: Subnet CR from fulfillment-api via EDA payload
+
+      subnet_name:
+        type: str
+        required: true
+        description: Name of the Subnet resource
+
+      template_parameters:
+        type: dict
+        description: Template-specific parameters (reserved for future use)
+        options: {}
+        default: {}

@@ -1,0 +1,7 @@
+---
+title: Subnet Template
+description: >
+  Provisions a Subnet resource as a ClusterUserDefinedNetwork (CUDN).
+  Creates Layer2 network with namespaceSelector matching the subnet-id label.
+
+template_type: subnet
