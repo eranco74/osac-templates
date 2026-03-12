@@ -17,7 +17,7 @@
     vn_ipv6_cidr: "{{ virtual_network.spec.ipv6Cidr | default('') }}"
     vn_network_class: "{{ virtual_network.spec.networkClass }}"
     vn_region: "{{ virtual_network.spec.region }}"
-    vn_tenant_id: "{{ virtual_network.metadata.annotations['osac.io/tenant-id'] | default('') }}"
+    vn_tenant_id: "{{ virtual_network.metadata.annotations['osac.openshift.io/tenant'] | default('') }}"
 
 - name: Display VirtualNetwork information
   ansible.builtin.debug:

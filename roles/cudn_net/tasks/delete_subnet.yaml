@@ -10,7 +10,7 @@
 - name: Extract Subnet configuration
   ansible.builtin.set_fact:
     subnet_name: "{{ subnet.metadata.name }}"
-    subnet_id: "{{ subnet.metadata.annotations['osac.io/subnet-id'] | default(subnet.metadata.name) }}"
+    subnet_id: "{{ subnet.metadata.labels['osac.openshift.io/subnet-uuid'] | default(subnet.metadata.name) }}"
 
 - name: Display deletion information
   ansible.builtin.debug:

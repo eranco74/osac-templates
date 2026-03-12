@@ -14,10 +14,10 @@
   ansible.builtin.set_fact:
     subnet_name: "{{ subnet.metadata.name }}"
     subnet_namespace: "{{ subnet.metadata.namespace }}"
-    subnet_id: "{{ subnet.metadata.annotations['osac.io/subnet-id'] | default(subnet.metadata.name) }}"
+    subnet_id: "{{ subnet.metadata.labels['osac.openshift.io/subnet-uuid'] | default(subnet.metadata.name) }}"
     subnet_ipv4_cidr: "{{ subnet.spec.ipv4Cidr | default('') }}"
     subnet_ipv6_cidr: "{{ subnet.spec.ipv6Cidr | default('') }}"
-    subnet_tenant_id: "{{ subnet.metadata.annotations['osac.io/tenant-id'] | default('') }}"
+    subnet_tenant_id: "{{ subnet.metadata.annotations['osac.openshift.io/tenant'] | default('') }}"
     subnet_virtual_network: "{{ subnet.spec.virtualNetwork | default('') }}"
 
 - name: Build CUDN subnets array
@@ -37,11 +37,11 @@
         default_subnet_labels | combine({
           'k8s.ovn.org/primary-user-defined-network': ''
         }) | combine(
-          {'osac.io/subnet-id': subnet_id} if subnet_id else {}
+          {'osac.openshift.io/subnet-id': subnet_id} if subnet_id else {}
         ) | combine(
-          {'osac.io/tenant-id': subnet_tenant_id} if subnet_tenant_id else {}
+          {'osac.openshift.io/tenant': subnet_tenant_id} if subnet_tenant_id else {}
         ) | combine(
-          {'osac.io/virtual-network': subnet_virtual_network} if subnet_virtual_network else {}
+          {'osac.openshift.io/virtual-network': subnet_virtual_network} if subnet_virtual_network else {}
         )
       }}
 
@@ -88,7 +88,7 @@
       spec:
         namespaceSelector:
           matchLabels:
-            osac.io/subnet-id: "{{ subnet_id }}"
+            osac.openshift.io/subnet-id: "{{ subnet_id }}"
         network:
           topology: "Layer2"
           layer2:

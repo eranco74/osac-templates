@@ -7,7 +7,7 @@
 # default_arg_specs: default values for arguement_specs
 ---
 - name: Include get remote cluster kubeconfig
-  ansible.builtin.include_tasks: get_remote_cluster_kubeconfig.yaml
+  ansible.builtin.include_tasks: ../../common/tasks/get_remote_cluster_kubeconfig.yaml
 
 - name: Merge template defaults into template_parameters
   ansible.builtin.set_fact:
