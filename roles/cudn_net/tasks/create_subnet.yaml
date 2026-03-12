@@ -24,20 +24,25 @@
   ansible.builtin.set_fact:
     cudn_subnets: >-
       {{
-        ((subnet_ipv4_cidr | length > 0) | ternary([{'cidr': subnet_ipv4_cidr}], []))
-        + ((subnet_ipv6_cidr | length > 0) | ternary([{'cidr': subnet_ipv6_cidr}], []))
+        ((subnet_ipv4_cidr | length > 0) | ternary([subnet_ipv4_cidr], []))
+        + ((subnet_ipv6_cidr | length > 0) | ternary([subnet_ipv6_cidr], []))
       }}
 
 - name: Build namespace labels
   ansible.builtin.set_fact:
+    # Note: k8s.ovn.org/primary-user-defined-network requires empty string value
+    # Only filter out optional osac.io labels that are truly unset
     namespace_labels: >-
       {{
         default_subnet_labels | combine({
-          'k8s.ovn.org/primary-user-defined-network': '',
-          'osac.io/subnet-id': subnet_id,
-          'osac.io/tenant-id': subnet_tenant_id,
-          'osac.io/virtual-network': subnet_virtual_network
-        }) | dict2items | rejectattr('value', 'equalto', '') | list | items2dict
+          'k8s.ovn.org/primary-user-defined-network': ''
+        }) | combine(
+          {'osac.io/subnet-id': subnet_id} if subnet_id else {}
+        ) | combine(
+          {'osac.io/tenant-id': subnet_tenant_id} if subnet_tenant_id else {}
+        ) | combine(
+          {'osac.io/virtual-network': subnet_virtual_network} if subnet_virtual_network else {}
+        )
       }}
 
 - name: Display Subnet information
@@ -85,6 +90,7 @@
           matchLabels:
             osac.io/subnet-id: "{{ subnet_id }}"
         network:
+          topology: "Layer2"
           layer2:
             role: "{{ default_layer2_role }}"
             ipamLifecycle: "{{ default_ipam_lifecycle }}"

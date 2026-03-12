@@ -3,6 +3,9 @@
 default_subnet_labels:
   osac.io/managed-by: osac-fulfillment
 
+# Default labels for VirtualNetwork resources
+default_vn_labels: "{{ {virtual_network_label: virtual_network_name} | default({}) }}"
+
 # Default argument specs (merged with template_parameters)
 default_arg_specs: {}
 

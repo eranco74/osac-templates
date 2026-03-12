@@ -1,7 +1,0 @@
----
-title: Virtual Network Template
-description: >
-  Provisions a VirtualNetwork resource. Note: VirtualNetwork is a logical grouping
-  for network configuration. Actual network resources (UDN) are created by Subnet.
-
-template_type: virtual_network
