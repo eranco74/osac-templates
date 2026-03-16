@@ -3,11 +3,9 @@
 # This stub logs information and returns success
 
 - name: Include get remote cluster kubeconfig
-  ansible.builtin.include_tasks: ../../common/tasks/get_remote_cluster_kubeconfig.yaml
-
-- name: Merge template defaults into template_parameters
-  ansible.builtin.set_fact:
-    params: "{{ default_arg_specs | combine(template_parameters) }}"
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: get_remote_cluster_kubeconfig
 
 - name: Extract VirtualNetwork configuration
   ansible.builtin.set_fact:
